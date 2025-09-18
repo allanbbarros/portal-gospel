@@ -13,22 +13,12 @@
 <!-- UTMify Pixel Script -->
 <script>
   window.pixelId = "6890066c4d245865ea1bf0b5";
-  // Inicializar UTMify imediatamente
-  (function() {
-    var script = document.createElement('script');
-    script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
-    script.async = true;
-    script.defer = true;
-    script.onload = function() {
-      console.log('UTMify pixel script loaded successfully');
-    };
-    script.onerror = function() {
-      console.log('Error loading UTMify pixel script');
-    };
-    document.head.appendChild(script);
-  })();
 </script>
-<script src="https://cdn.utmify.com.br/scripts/pixel/pixel.js" async defer></script>
+<script
+  src="https://cdn.utmify.com.br/scripts/pixel/pixel.js"
+  async
+  defer
+></script>
 <script>
   // Debug para verificar se o pixel carregou
   window.addEventListener('load', function() {
@@ -39,7 +29,23 @@
     } else {
       console.log('UTMify object not found');
     }
+    // Verificar se o pixel está funcionando
+    if (window.pixelId) {
+      console.log('Pixel ID está definido:', window.pixelId);
+    }
   });
+  
+  // Forçar inicialização do UTMify após 2 segundos
+  setTimeout(function() {
+    if (typeof window.utmify === 'undefined') {
+      console.log('UTMify não carregou, tentando novamente...');
+      var script = document.createElement('script');
+      script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+  }, 2000);
 </script>
 <!-- Meta Pixel Code -->
 <script>
@@ -1204,6 +1210,17 @@ button_text: button.textContent,
 url: window.location.href
 });
 console.log('UTMify conversion tracked');
+} else {
+console.log('UTMify não disponível para tracking');
+// Tentar carregar UTMify novamente
+if (window.pixelId) {
+console.log('Tentando carregar UTMify novamente...');
+var script = document.createElement('script');
+script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
+script.async = true;
+script.defer = true;
+document.head.appendChild(script);
+}
 }
 // Tracking Facebook Pixel
 if (typeof fbq !== 'undefined') {
