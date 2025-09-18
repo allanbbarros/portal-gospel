@@ -12,11 +12,18 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
 <script>
   window.pixelId = "6890066c4d245865ea1bf0b5";
-  var a = document.createElement("script");
-  a.setAttribute("async", "");
-  a.setAttribute("defer", "");
-  a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
-  document.head.appendChild(a);
+</script>
+<script
+  src="https://cdn.utmify.com.br/scripts/pixel/pixel.js"
+  async
+  defer
+></script>
+<script>
+  // Debug para verificar se o pixel carregou
+  window.addEventListener('load', function() {
+    console.log('Pixel ID:', window.pixelId);
+    console.log('UTMify pixel script loaded');
+  });
 </script>
 <style>
 :where([class^="ri-"])::before {
