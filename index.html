@@ -10,19 +10,35 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<!-- UTMify Pixel Script -->
 <script>
   window.pixelId = "6890066c4d245865ea1bf0b5";
+  // Inicializar UTMify imediatamente
+  (function() {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
+    script.async = true;
+    script.defer = true;
+    script.onload = function() {
+      console.log('UTMify pixel script loaded successfully');
+    };
+    script.onerror = function() {
+      console.log('Error loading UTMify pixel script');
+    };
+    document.head.appendChild(script);
+  })();
 </script>
-<script
-  src="https://cdn.utmify.com.br/scripts/pixel/pixel.js"
-  async
-  defer
-></script>
+<script src="https://cdn.utmify.com.br/scripts/pixel/pixel.js" async defer></script>
 <script>
   // Debug para verificar se o pixel carregou
   window.addEventListener('load', function() {
     console.log('Pixel ID:', window.pixelId);
     console.log('UTMify pixel script loaded');
+    if (typeof window.utmify !== 'undefined') {
+      console.log('UTMify object loaded successfully');
+    } else {
+      console.log('UTMify object not found');
+    }
   });
 </script>
 <!-- Meta Pixel Code -->
@@ -1175,11 +1191,25 @@ menuIcon.textContent = '☰';
 
 <script id="cta-buttons-script">
 document.addEventListener('DOMContentLoaded', function() {
-const ctaButtons = document.querySelectorAll('button');
+const ctaButtons = document.querySelectorAll('a[href*="ggcheckout"], button');
 ctaButtons.forEach(button => {
-if (button.textContent.includes('Começar') || button.textContent.includes('Acessar')) {
+if (button.textContent.includes('Começar') || button.textContent.includes('Acessar') || button.textContent.includes('Quero') || button.textContent.includes('Escolha') || button.textContent.includes('Melhor')) {
 button.addEventListener('click', function() {
 console.log('CTA button clicked:', button.textContent);
+// Tracking UTMify
+if (typeof window.utmify !== 'undefined' && window.utmify.track) {
+window.utmify.track('conversion', {
+event: 'click',
+button_text: button.textContent,
+url: window.location.href
+});
+console.log('UTMify conversion tracked');
+}
+// Tracking Facebook Pixel
+if (typeof fbq !== 'undefined') {
+fbq('track', 'InitiateCheckout');
+console.log('Facebook Pixel InitiateCheckout tracked');
+}
 });
 }
 });
