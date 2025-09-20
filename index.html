@@ -179,6 +179,36 @@
     return originalXHROpen.apply(this, [method, url, ...args]);
   };
   
+  // Interceptar TODOS os logs do console
+  const originalConsoleLog = console.log;
+  console.log = function(...args) {
+    const message = args.join(' ');
+    if (message.includes('canAddToCart false') ||
+        message.includes('Failed to load resource') ||
+        message.includes('400') ||
+        message.includes('pixel.js') ||
+        message.includes('events:1') ||
+        message.includes('response for 6890066c4d245865ea1bf0b5')) {
+      return;
+    }
+    originalConsoleLog.apply(console, args);
+  };
+  
+  // Interceptar console.info também
+  const originalConsoleInfo = console.info;
+  console.info = function(...args) {
+    const message = args.join(' ');
+    if (message.includes('canAddToCart false') ||
+        message.includes('Failed to load resource') ||
+        message.includes('400') ||
+        message.includes('pixel.js') ||
+        message.includes('events:1') ||
+        message.includes('response for 6890066c4d245865ea1bf0b5')) {
+      return;
+    }
+    originalConsoleInfo.apply(console, args);
+  };
+  
   // Carregar após DOM
   document.addEventListener('DOMContentLoaded', function() {
     setTimeout(loadUTMify, 3000);
