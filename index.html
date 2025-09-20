@@ -36,15 +36,7 @@
     document.head.appendChild(script);
   });
 </script>
-<!-- Google Pixel Code -->
-<script>
-  window.googlePixelId = "68ce15610b5859f6b07a70ac";
-  var a = document.createElement("script");
-  a.setAttribute("async", "");
-  a.setAttribute("defer", "");
-  a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel-google.js");
-  document.head.appendChild(a);
-</script>
+<!-- Google Pixel removido (causava erro 400) -->
 <style>
 :where([class^="ri-"])::before {
 content: "\f3c2";
@@ -1202,10 +1194,7 @@ document.addEventListener('DOMContentLoaded', function() {
           console.log('UTMify não disponível para tracking');
         }
         
-        // Tracking Google Pixel
-        if (typeof window.googlePixelId !== 'undefined') {
-          console.log('Google Pixel ID:', window.googlePixelId);
-        }
+        // Google Pixel removido (causava erro 400)
       });
     });
   }, 2000); // Aguardar 2 segundos para UTMify carregar
