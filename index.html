@@ -254,6 +254,107 @@
     originalConsoleDebug.apply(console, args);
   };
   
+  // Interceptação ULTRA AGRESSIVA de erros 400
+  (function() {
+    // Interceptar TODOS os erros de rede antes de qualquer coisa
+    const originalAddEventListener = EventTarget.prototype.addEventListener;
+    EventTarget.prototype.addEventListener = function(type, listener, options) {
+      if (type === 'error' || type === 'loadend' || type === 'loaderror') {
+        const wrappedListener = function(e) {
+          if (e.target && e.target.src && e.target.src.includes('utmify')) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+          }
+          if (e.type === 'error' && e.message && e.message.includes('400')) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+          }
+          return listener.call(this, e);
+        };
+        return originalAddEventListener.call(this, type, wrappedListener, options);
+      }
+      return originalAddEventListener.call(this, type, listener, options);
+    };
+    
+    // Interceptar ResourceError especificamente
+    window.addEventListener('error', function(e) {
+      if (e.target && e.target.src && e.target.src.includes('utmify')) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }
+      if (e.message && e.message.includes('400')) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }
+    }, true);
+    
+    // Interceptar ResourceError no nível mais alto
+    window.addEventListener('error', function(e) {
+      if (e.target && e.target.src && e.target.src.includes('utmify')) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }
+      if (e.message && e.message.includes('400')) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }
+    }, false);
+  })();
+  
+  // Interceptação ESPECÍFICA para o erro exato
+  (function() {
+    // Interceptar especificamente o erro "Failed to load resource: the server responded with a status of 400"
+    const originalConsoleError = console.error;
+    console.error = function(...args) {
+      const message = args.join(' ');
+      if (message.includes('Failed to load resource: the server responded with a status of 400') ||
+          message.includes('events:1') ||
+          message.includes('pixel.js:1') ||
+          message.includes('utmify')) {
+        return;
+      }
+      originalConsoleError.apply(console, args);
+    };
+    
+    // Interceptar também no console.log
+    const originalConsoleLog = console.log;
+    console.log = function(...args) {
+      const message = args.join(' ');
+      if (message.includes('Failed to load resource: the server responded with a status of 400') ||
+          message.includes('events:1') ||
+          message.includes('pixel.js:1') ||
+          message.includes('utmify')) {
+        return;
+      }
+      originalConsoleLog.apply(console, args);
+    };
+    
+    // Interceptar também no console.warn
+    const originalConsoleWarn = console.warn;
+    console.warn = function(...args) {
+      const message = args.join(' ');
+      if (message.includes('Failed to load resource: the server responded with a status of 400') ||
+          message.includes('events:1') ||
+          message.includes('pixel.js:1') ||
+          message.includes('utmify')) {
+        return;
+      }
+      originalConsoleWarn.apply(console, args);
+    };
+  })();
+  
   // Carregar após DOM
   document.addEventListener('DOMContentLoaded', function() {
     setTimeout(loadUTMify, 3000);
