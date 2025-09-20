@@ -11,42 +11,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
-<!-- UTMify Script -->
+<!-- UTMify Script - Versão simplificada -->
 <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 
-<!-- UTMify Pixel -->
+<!-- UTMify Pixel - Versão básica sem erros -->
 <script>
-  // Configurar UTMify antes de carregar
+  // Configuração mínima do UTMify
   window.pixelId = "6890066c4d245865ea1bf0b5";
-  window.utmifyConfig = {
-    debug: false,
-    autoTrack: true,
-    waitForInit: true
-  };
   
-  // Aguardar DOM carregar completamente
-  document.addEventListener('DOMContentLoaded', function() {
-    // Aguardar mais um pouco para garantir que tudo carregou
-    setTimeout(function() {
-      var script = document.createElement('script');
-      script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
-      script.async = true;
-      script.defer = true;
-      script.onload = function() {
-        console.log('UTMify pixel carregado com sucesso');
-        // Aguardar inicialização completa
-        setTimeout(function() {
-          if (window.utmify) {
-            console.log('UTMify inicializado completamente');
-          }
-        }, 2000);
-      };
-      script.onerror = function() {
-        console.log('Erro ao carregar UTMify pixel');
-      };
-      document.head.appendChild(script);
-    }, 1000);
-  });
+  // Carregar apenas o script básico
+  (function() {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  })();
 </script>
 <!-- Google Pixel removido (causava erro 400) -->
 <style>
