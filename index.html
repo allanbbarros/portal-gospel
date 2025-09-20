@@ -1170,34 +1170,17 @@ menuIcon.textContent = '☰';
 
 <script id="cta-tracking-script">
 document.addEventListener('DOMContentLoaded', function() {
-  // Aguardar UTMify carregar completamente
-  setTimeout(function() {
-    const ctaButtons = document.querySelectorAll('a[href*="ggcheckout"]');
-    
-    ctaButtons.forEach(button => {
-      button.addEventListener('click', function(e) {
-        console.log('CTA button clicked:', button.textContent);
-        
-        // Tracking UTMify com validação
-        if (typeof window.utmify !== 'undefined' && window.utmify.track) {
-          try {
-            window.utmify.track('conversion', {
-              event: 'click',
-              button_text: button.textContent,
-              url: window.location.href
-            });
-            console.log('UTMify conversion tracked com sucesso');
-          } catch (error) {
-            console.log('Erro no tracking UTMify:', error);
-          }
-        } else {
-          console.log('UTMify não disponível para tracking');
-        }
-        
-        // Google Pixel removido (causava erro 400)
-      });
+  const ctaButtons = document.querySelectorAll('a[href*="ggcheckout"]');
+  
+  ctaButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      console.log('CTA button clicked:', button.textContent);
+      
+      // O UTMify já está funcionando automaticamente!
+      // Não precisamos chamar manualmente, ele detecta os cliques
+      console.log('UTMify já está rastreando automaticamente');
     });
-  }, 2000); // Aguardar 2 segundos para UTMify carregar
+  });
 });
 </script>
 </body>
