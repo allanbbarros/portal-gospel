@@ -11,59 +11,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
-<!-- UTMify Script - Versão simplificada -->
+<!-- UTMify Script - Apenas UTM tracking básico (sem pixel problemático) -->
 <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 
-<!-- UTMify Pixel - Versão corrigida sem erros -->
+<!-- UTMify Pixel - DESABILITADO temporariamente devido a erros persistentes -->
+<!-- 
 <script>
-  // Configuração robusta do UTMify
-  window.pixelId = "6890066c4d245865ea1bf0b5";
-  window.utmifyConfig = {
-    debug: false,
-    autoTrack: true,
-    waitForInit: true,
-    retryAttempts: 3,
-    retryDelay: 1000
-  };
-  
-  // Função para carregar o pixel com retry
-  function loadUTMifyPixel() {
-    var script = document.createElement('script');
-    script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
-    script.async = true;
-    script.defer = true;
-    
-    script.onload = function() {
-      console.log('UTMify pixel carregado com sucesso');
-      // Aguardar inicialização completa
-      setTimeout(function() {
-        if (window.utmify && typeof window.utmify.init === 'function') {
-          try {
-            window.utmify.init();
-            console.log('UTMify inicializado completamente');
-          } catch (e) {
-            console.log('Erro na inicialização do UTMify:', e);
-          }
-        }
-      }, 2000);
-    };
-    
-    script.onerror = function() {
-      console.log('Erro ao carregar UTMify pixel, tentando novamente...');
-      if (window.utmifyConfig.retryAttempts > 0) {
-        window.utmifyConfig.retryAttempts--;
-        setTimeout(loadUTMifyPixel, window.utmifyConfig.retryDelay);
-      }
-    };
-    
-    document.head.appendChild(script);
-  }
-  
-  // Aguardar DOM carregar completamente
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(loadUTMifyPixel, 1000);
-  });
+  // UTMify pixel desabilitado - causava erros 400 e TypeError
+  // O script de UTM tracking acima já funciona perfeitamente
+  console.log('UTMify pixel desabilitado - usando apenas UTM tracking');
 </script>
+-->
 <!-- Google Pixel removido (causava erro 400) -->
 <style>
 :where([class^="ri-"])::before {
@@ -1202,23 +1160,15 @@ document.addEventListener('DOMContentLoaded', function() {
   
   ctaButtons.forEach(button => {
     button.addEventListener('click', function(e) {
-      console.log('CTA button clicked:', button.textContent);
+      console.log('CTA button clicked:', button.textContent.trim());
+      console.log('Link:', button.href);
       
-      // Aguardar um pouco para garantir que o UTMify processou o clique
-      setTimeout(function() {
-        console.log('UTMify processou o clique automaticamente');
-      }, 500);
+      // O UTMify UTM tracking já funciona automaticamente
+      // Não precisamos de tracking adicional
     });
   });
   
-  // Verificar se UTMify está funcionando
-  setTimeout(function() {
-    if (window.utmify) {
-      console.log('UTMify está disponível e funcionando');
-    } else {
-      console.log('UTMify ainda não está disponível');
-    }
-  }, 3000);
+  console.log('Sistema de tracking configurado - UTMify UTM tracking ativo');
 });
 </script>
 </body>
