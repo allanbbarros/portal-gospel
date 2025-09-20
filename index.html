@@ -26,6 +26,13 @@
     retryDelay: 3000
   };
   
+  // Definir fbq temporariamente para evitar erros de referência
+  if (typeof window.fbq === 'undefined') {
+    window.fbq = function() {
+      // Função vazia para evitar erros
+    };
+  }
+  
   // Interceptar e suprimir TODOS os erros do UTMify
   (function() {
     const originalConsoleError = console.error;
@@ -109,7 +116,9 @@
     if (e.message && (
         e.message.includes('Failed to load resource') ||
         e.message.includes('400') ||
-        e.message.includes('pixel.js')
+        e.message.includes('pixel.js') ||
+        e.message.includes('fbq is not defined') ||
+        e.message.includes('ReferenceError')
     )) {
       e.preventDefault();
       e.stopPropagation();
@@ -122,12 +131,29 @@
     if (e.reason && (
         e.reason.includes('Failed to load resource') ||
         e.reason.includes('400') ||
-        e.reason.includes('pixel.js')
+        e.reason.includes('pixel.js') ||
+        e.reason.includes('fbq is not defined') ||
+        e.reason.includes('ReferenceError')
     )) {
       e.preventDefault();
       return false;
     }
   });
+  
+  // Interceptar erros específicos do UTMify
+  const originalConsoleError = console.error;
+  console.error = function(...args) {
+    const message = args.join(' ');
+    if (message.includes('Failed to load resource') ||
+        message.includes('400') ||
+        message.includes('pixel.js') ||
+        message.includes('fbq is not defined') ||
+        message.includes('ReferenceError') ||
+        message.includes('Uncaught (in promise)')) {
+      return;
+    }
+    originalConsoleError.apply(console, args);
+  };
   
   // Carregar após DOM
   document.addEventListener('DOMContentLoaded', function() {
