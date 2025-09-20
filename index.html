@@ -14,19 +14,55 @@
 <!-- UTMify Script - Versão simplificada -->
 <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 
-<!-- UTMify Pixel - Versão básica sem erros -->
+<!-- UTMify Pixel - Versão corrigida sem erros -->
 <script>
-  // Configuração mínima do UTMify
+  // Configuração robusta do UTMify
   window.pixelId = "6890066c4d245865ea1bf0b5";
+  window.utmifyConfig = {
+    debug: false,
+    autoTrack: true,
+    waitForInit: true,
+    retryAttempts: 3,
+    retryDelay: 1000
+  };
   
-  // Carregar apenas o script básico
-  (function() {
+  // Função para carregar o pixel com retry
+  function loadUTMifyPixel() {
     var script = document.createElement('script');
     script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
     script.async = true;
     script.defer = true;
+    
+    script.onload = function() {
+      console.log('UTMify pixel carregado com sucesso');
+      // Aguardar inicialização completa
+      setTimeout(function() {
+        if (window.utmify && typeof window.utmify.init === 'function') {
+          try {
+            window.utmify.init();
+            console.log('UTMify inicializado completamente');
+          } catch (e) {
+            console.log('Erro na inicialização do UTMify:', e);
+          }
+        }
+      }, 2000);
+    };
+    
+    script.onerror = function() {
+      console.log('Erro ao carregar UTMify pixel, tentando novamente...');
+      if (window.utmifyConfig.retryAttempts > 0) {
+        window.utmifyConfig.retryAttempts--;
+        setTimeout(loadUTMifyPixel, window.utmifyConfig.retryDelay);
+      }
+    };
+    
     document.head.appendChild(script);
-  })();
+  }
+  
+  // Aguardar DOM carregar completamente
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(loadUTMifyPixel, 1000);
+  });
 </script>
 <!-- Google Pixel removido (causava erro 400) -->
 <style>
@@ -1168,11 +1204,21 @@ document.addEventListener('DOMContentLoaded', function() {
     button.addEventListener('click', function(e) {
       console.log('CTA button clicked:', button.textContent);
       
-      // O UTMify já está funcionando automaticamente!
-      // Não precisamos chamar manualmente, ele detecta os cliques
-      console.log('UTMify já está rastreando automaticamente');
+      // Aguardar um pouco para garantir que o UTMify processou o clique
+      setTimeout(function() {
+        console.log('UTMify processou o clique automaticamente');
+      }, 500);
     });
   });
+  
+  // Verificar se UTMify está funcionando
+  setTimeout(function() {
+    if (window.utmify) {
+      console.log('UTMify está disponível e funcionando');
+    } else {
+      console.log('UTMify ainda não está disponível');
+    }
+  }, 3000);
 });
 </script>
 </body>
