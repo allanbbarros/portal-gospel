@@ -14,14 +14,26 @@
 <!-- UTMify Script - Apenas UTM tracking básico (sem pixel problemático) -->
 <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 
-<!-- UTMify Pixel - DESABILITADO temporariamente devido a erros persistentes -->
-<!-- 
+<!-- UTMify Pixel - Versão simplificada para conversões -->
 <script>
-  // UTMify pixel desabilitado - causava erros 400 e TypeError
-  // O script de UTM tracking acima já funciona perfeitamente
-  console.log('UTMify pixel desabilitado - usando apenas UTM tracking');
+  // Configuração mínima para conversões
+  window.pixelId = "6890066c4d245865ea1bf0b5";
+  
+  // Carregar pixel de forma mais simples
+  (function() {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
+    script.async = true;
+    script.defer = true;
+    script.onload = function() {
+      console.log('UTMify pixel carregado para conversões');
+    };
+    script.onerror = function() {
+      console.log('Erro ao carregar UTMify pixel - continuando sem ele');
+    };
+    document.head.appendChild(script);
+  })();
 </script>
--->
 <!-- Google Pixel removido (causava erro 400) -->
 <style>
 :where([class^="ri-"])::before {
@@ -1163,12 +1175,33 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('CTA button clicked:', button.textContent.trim());
       console.log('Link:', button.href);
       
-      // O UTMify UTM tracking já funciona automaticamente
-      // Não precisamos de tracking adicional
+      // Aguardar UTMify processar o clique
+      setTimeout(function() {
+        // Tentar marcar conversão se UTMify estiver disponível
+        if (window.utmify && typeof window.utmify.track === 'function') {
+          try {
+            window.utmify.track('conversion', {
+              value: getPlanValue(button.textContent.trim()),
+              currency: 'BRL'
+            });
+            console.log('Conversão marcada no UTMify');
+          } catch (e) {
+            console.log('Erro ao marcar conversão:', e);
+          }
+        }
+      }, 1000);
     });
   });
   
-  console.log('Sistema de tracking configurado - UTMify UTM tracking ativo');
+  // Função para obter valor do plano
+  function getPlanValue(buttonText) {
+    if (buttonText.includes('Mensal') || buttonText.includes('Agora')) return 13.90;
+    if (buttonText.includes('Anual') || buttonText.includes('Inteligente')) return 22.90;
+    if (buttonText.includes('Vitalício') || buttonText.includes('Escolha')) return 29.90;
+    return 0;
+  }
+  
+  console.log('Sistema de tracking configurado - UTMify ativo para conversões');
 });
 </script>
 </body>
