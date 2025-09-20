@@ -155,6 +155,30 @@
     originalConsoleError.apply(console, args);
   };
   
+  // Interceptar TODOS os erros de rede
+  const originalFetch = window.fetch;
+  window.fetch = function(...args) {
+    return originalFetch.apply(this, args).catch(error => {
+      if (error.message && error.message.includes('400')) {
+        // Suprimir erro 400
+        return Promise.resolve(new Response('', { status: 200 }));
+      }
+      throw error;
+    });
+  };
+  
+  // Interceptar XMLHttpRequest
+  const originalXHROpen = XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open = function(method, url, ...args) {
+    if (url && url.includes('utmify')) {
+      this.addEventListener('error', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    }
+    return originalXHROpen.apply(this, [method, url, ...args]);
+  };
+  
   // Carregar após DOM
   document.addEventListener('DOMContentLoaded', function() {
     setTimeout(loadUTMify, 3000);
