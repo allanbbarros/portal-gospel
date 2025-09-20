@@ -19,24 +19,34 @@
   // Configurar UTMify antes de carregar
   window.pixelId = "6890066c4d245865ea1bf0b5";
   window.utmifyConfig = {
-    debug: true,
-    autoTrack: true
+    debug: false,
+    autoTrack: true,
+    waitForInit: true
   };
   
-  // Carregar pixel de forma mais simples
-  (function() {
-    var script = document.createElement('script');
-    script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
-    script.async = true;
-    script.defer = true;
-    script.onload = function() {
-      console.log('UTMify pixel carregado com sucesso');
-    };
-    script.onerror = function() {
-      console.log('Erro ao carregar UTMify pixel');
-    };
-    document.head.appendChild(script);
-  })();
+  // Aguardar DOM carregar completamente
+  document.addEventListener('DOMContentLoaded', function() {
+    // Aguardar mais um pouco para garantir que tudo carregou
+    setTimeout(function() {
+      var script = document.createElement('script');
+      script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
+      script.async = true;
+      script.defer = true;
+      script.onload = function() {
+        console.log('UTMify pixel carregado com sucesso');
+        // Aguardar inicialização completa
+        setTimeout(function() {
+          if (window.utmify) {
+            console.log('UTMify inicializado completamente');
+          }
+        }, 2000);
+      };
+      script.onerror = function() {
+        console.log('Erro ao carregar UTMify pixel');
+      };
+      document.head.appendChild(script);
+    }, 1000);
+  });
 </script>
 <!-- Google Pixel removido (causava erro 400) -->
 <style>
