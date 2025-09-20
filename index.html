@@ -1192,8 +1192,10 @@ document.addEventListener('DOMContentLoaded', function() {
 const ctaButtons = document.querySelectorAll('a[href*="ggcheckout"], button');
 ctaButtons.forEach(button => {
 if (button.textContent.includes('Começar') || button.textContent.includes('Acessar') || button.textContent.includes('Quero') || button.textContent.includes('Escolha') || button.textContent.includes('Melhor')) {
-button.addEventListener('click', function() {
+button.addEventListener('click', function(e) {
+e.preventDefault(); // Prevenir redirecionamento imediato
 console.log('CTA button clicked:', button.textContent);
+
 // Tracking UTMify
 if (typeof window.utmify !== 'undefined' && window.utmify.track) {
 window.utmify.track('conversion', {
@@ -1214,10 +1216,21 @@ script.defer = true;
 document.head.appendChild(script);
 }
 }
+
 // Tracking Google Pixel
 if (typeof window.googlePixelId !== 'undefined') {
 console.log('Google Pixel ID:', window.googlePixelId);
 }
+
+// Mostrar indicador de carregamento
+button.style.opacity = '0.7';
+button.style.pointerEvents = 'none';
+button.textContent = 'Redirecionando...';
+
+// Aguardar 1 segundo para o tracking ser enviado antes do redirecionamento
+setTimeout(function() {
+window.location.href = button.href;
+}, 1000);
 });
 }
 });
