@@ -16,25 +16,27 @@
 
 <!-- UTMify Pixel -->
 <script>
+  // Configurar UTMify antes de carregar
   window.pixelId = "6890066c4d245865ea1bf0b5";
+  window.utmifyConfig = {
+    debug: true,
+    autoTrack: true
+  };
   
-  // Aguardar DOM carregar antes de inicializar
-  document.addEventListener('DOMContentLoaded', function() {
+  // Carregar pixel de forma mais simples
+  (function() {
     var script = document.createElement('script');
     script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
     script.async = true;
     script.defer = true;
     script.onload = function() {
       console.log('UTMify pixel carregado com sucesso');
-      // Aguardar um pouco para o tracker inicializar
-      setTimeout(function() {
-        if (window.utmify && window.utmify.track) {
-          console.log('UTMify tracker pronto para uso');
-        }
-      }, 1000);
+    };
+    script.onerror = function() {
+      console.log('Erro ao carregar UTMify pixel');
     };
     document.head.appendChild(script);
-  });
+  })();
 </script>
 <!-- Google Pixel removido (causava erro 400) -->
 <style>
