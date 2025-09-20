@@ -14,14 +14,66 @@
 <!-- UTMify Script - Apenas UTM tracking básico (sem pixel problemático) -->
 <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 
-<!-- UTMify Pixel - DESABILITADO devido a erros persistentes -->
-<!-- 
+<!-- UTMify Pixel - Versão corrigida com tratamento de erros -->
 <script>
-  // UTMify pixel desabilitado - causava erros 400 e TypeError persistentes
-  // Usando apenas UTM tracking + sistema alternativo de conversões
-  console.log('UTMify pixel desabilitado - usando sistema alternativo');
+  // Configuração do UTMify com tratamento robusto de erros
+  window.pixelId = "6890066c4d245865ea1bf0b5";
+  window.utmifyConfig = {
+    debug: false,
+    autoTrack: false, // Desabilitar auto-track para evitar erros
+    waitForInit: true,
+    retryAttempts: 5,
+    retryDelay: 2000
+  };
+  
+  // Função para carregar UTMify com tratamento de erros
+  function loadUTMifyWithErrorHandling() {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
+    script.async = true;
+    script.defer = true;
+    
+    script.onload = function() {
+      console.log('UTMify pixel carregado');
+      
+      // Aguardar inicialização completa
+      setTimeout(function() {
+        if (window.utmify) {
+          try {
+            // Configurar tratamento de erros global
+            window.utmify.onError = function(error) {
+              console.log('UTMify error tratado:', error);
+              return true; // Suprimir erro
+            };
+            
+            // Inicializar com tratamento de erro
+            if (typeof window.utmify.init === 'function') {
+              window.utmify.init();
+              console.log('UTMify inicializado com sucesso');
+            }
+          } catch (e) {
+            console.log('Erro na inicialização do UTMify:', e);
+          }
+        }
+      }, 3000);
+    };
+    
+    script.onerror = function() {
+      console.log('Erro ao carregar UTMify, tentando novamente...');
+      if (window.utmifyConfig.retryAttempts > 0) {
+        window.utmifyConfig.retryAttempts--;
+        setTimeout(loadUTMifyWithErrorHandling, window.utmifyConfig.retryDelay);
+      }
+    };
+    
+    document.head.appendChild(script);
+  }
+  
+  // Carregar após DOM estar pronto
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(loadUTMifyWithErrorHandling, 2000);
+  });
 </script>
--->
 <!-- Google Pixel removido (causava erro 400) -->
 <style>
 :where([class^="ri-"])::before {
@@ -1180,7 +1232,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return 0;
   }
   
-  // Sistema alternativo de tracking de conversões
+  // Sistema de tracking de conversões com UTMify
   function trackConversion(buttonText, value, url) {
     // 1. Salvar no localStorage para análise
     const conversion = {
@@ -1200,7 +1252,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Conversão salva localmente:', conversion);
     
-    // 2. Enviar para Google Analytics se disponível
+    // 2. Enviar para UTMify se disponível
+    setTimeout(function() {
+      if (window.utmify && typeof window.utmify.track === 'function') {
+        try {
+          window.utmify.track('conversion', {
+            value: value,
+            currency: 'BRL',
+            event_name: 'purchase',
+            button_text: buttonText
+          });
+          console.log('Conversão enviada para UTMify');
+        } catch (e) {
+          console.log('Erro ao enviar para UTMify:', e);
+        }
+      } else {
+        console.log('UTMify não disponível ainda');
+      }
+    }, 2000);
+    
+    // 3. Enviar para Google Analytics se disponível
     if (typeof gtag !== 'undefined') {
       gtag('event', 'conversion', {
         'event_category': 'purchase',
@@ -1211,7 +1282,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('Conversão enviada para Google Analytics');
     }
     
-    // 3. Enviar para Facebook Pixel se disponível
+    // 4. Enviar para Facebook Pixel se disponível
     if (typeof fbq !== 'undefined') {
       fbq('track', 'Purchase', {
         value: value,
@@ -1220,7 +1291,6 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('Conversão enviada para Facebook Pixel');
     }
     
-    // 4. Log para debug
     console.log('Sistema de conversão ativo - dados salvos');
   }
   
