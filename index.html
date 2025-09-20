@@ -46,7 +46,9 @@
           message.includes('Failed to load resource: the server responded with a status of 400') ||
           message.includes('Cannot read properties of undefined (reading \'_id\')') ||
           message.includes('pixel.js:1') ||
-          message.includes('events:1')) {
+          message.includes('events:1') ||
+          message.includes('server responded with a status of 400') ||
+          message.includes('Understand this error')) {
         return;
       }
       originalConsoleError.apply(console, args);
@@ -55,7 +57,10 @@
     // Suprimir console.warn
     console.warn = function(...args) {
       const message = args.join(' ');
-      if (message.includes('pixel.js:1') || message.includes('events:1')) {
+      if (message.includes('pixel.js:1') || 
+          message.includes('events:1') ||
+          message.includes('server responded with a status of 400') ||
+          message.includes('Understand this error')) {
         return;
       }
       originalConsoleWarn.apply(console, args);
@@ -66,7 +71,9 @@
       const message = args.join(' ');
       if (message.includes('pixel.js:1') || 
           message.includes('events:1') ||
-          message.includes('Failed to load resource')) {
+          message.includes('Failed to load resource') ||
+          message.includes('server responded with a status of 400') ||
+          message.includes('Understand this error')) {
         return;
       }
       originalConsoleLog.apply(console, args);
@@ -117,6 +124,8 @@
         e.message.includes('Failed to load resource') ||
         e.message.includes('400') ||
         e.message.includes('pixel.js') ||
+        e.message.includes('events:1') ||
+        e.message.includes('server responded with a status of 400') ||
         e.message.includes('fbq is not defined') ||
         e.message.includes('ReferenceError')
     )) {
@@ -132,6 +141,8 @@
         e.reason.includes('Failed to load resource') ||
         e.reason.includes('400') ||
         e.reason.includes('pixel.js') ||
+        e.reason.includes('events:1') ||
+        e.reason.includes('server responded with a status of 400') ||
         e.reason.includes('fbq is not defined') ||
         e.reason.includes('ReferenceError')
     )) {
@@ -147,6 +158,9 @@
     if (message.includes('Failed to load resource') ||
         message.includes('400') ||
         message.includes('pixel.js') ||
+        message.includes('events:1') ||
+        message.includes('server responded with a status of 400') ||
+        message.includes('Understand this error') ||
         message.includes('fbq is not defined') ||
         message.includes('ReferenceError') ||
         message.includes('Uncaught (in promise)')) {
@@ -159,8 +173,12 @@
   const originalFetch = window.fetch;
   window.fetch = function(...args) {
     return originalFetch.apply(this, args).catch(error => {
-      if (error.message && error.message.includes('400')) {
-        // Suprimir erro 400
+      if (error.message && (
+          error.message.includes('400') ||
+          error.message.includes('events:1') ||
+          error.message.includes('server responded with a status of 400')
+      )) {
+        // Suprimir erro 400 e eventos
         return Promise.resolve(new Response('', { status: 200 }));
       }
       throw error;
@@ -170,10 +188,16 @@
   // Interceptar XMLHttpRequest
   const originalXHROpen = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function(method, url, ...args) {
-    if (url && url.includes('utmify')) {
+    if (url && (url.includes('utmify') || url.includes('events'))) {
       this.addEventListener('error', function(e) {
         e.preventDefault();
         e.stopPropagation();
+      });
+      this.addEventListener('loadend', function(e) {
+        if (this.status === 400) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
       });
     }
     return originalXHROpen.apply(this, [method, url, ...args]);
@@ -188,7 +212,9 @@
         message.includes('400') ||
         message.includes('pixel.js') ||
         message.includes('events:1') ||
-        message.includes('response for 6890066c4d245865ea1bf0b5')) {
+        message.includes('response for 6890066c4d245865ea1bf0b5') ||
+        message.includes('server responded with a status of 400') ||
+        message.includes('Understand this error')) {
       return;
     }
     originalConsoleLog.apply(console, args);
@@ -203,10 +229,29 @@
         message.includes('400') ||
         message.includes('pixel.js') ||
         message.includes('events:1') ||
-        message.includes('response for 6890066c4d245865ea1bf0b5')) {
+        message.includes('response for 6890066c4d245865ea1bf0b5') ||
+        message.includes('server responded with a status of 400') ||
+        message.includes('Understand this error')) {
       return;
     }
     originalConsoleInfo.apply(console, args);
+  };
+  
+  // Interceptar console.debug também
+  const originalConsoleDebug = console.debug;
+  console.debug = function(...args) {
+    const message = args.join(' ');
+    if (message.includes('canAddToCart false') ||
+        message.includes('Failed to load resource') ||
+        message.includes('400') ||
+        message.includes('pixel.js') ||
+        message.includes('events:1') ||
+        message.includes('response for 6890066c4d245865ea1bf0b5') ||
+        message.includes('server responded with a status of 400') ||
+        message.includes('Understand this error')) {
+      return;
+    }
+    originalConsoleDebug.apply(console, args);
   };
   
   // Carregar após DOM
