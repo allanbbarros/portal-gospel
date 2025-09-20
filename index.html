@@ -14,20 +14,36 @@
 <!-- UTMify Script - Apenas UTM tracking básico (sem pixel problemático) -->
 <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 
-<!-- UTMify Pixel - Versão corrigida com tratamento de erros -->
+<!-- UTMify Pixel - Versão com supressão total de erros -->
 <script>
-  // Configuração do UTMify com tratamento robusto de erros
+  // Configuração do UTMify
   window.pixelId = "6890066c4d245865ea1bf0b5";
   window.utmifyConfig = {
     debug: false,
-    autoTrack: false, // Desabilitar auto-track para evitar erros
+    autoTrack: false,
     waitForInit: true,
-    retryAttempts: 5,
-    retryDelay: 2000
+    retryAttempts: 3,
+    retryDelay: 3000
   };
   
-  // Função para carregar UTMify com tratamento de erros
-  function loadUTMifyWithErrorHandling() {
+  // Interceptar e suprimir erros do UTMify
+  (function() {
+    const originalConsoleError = console.error;
+    console.error = function(...args) {
+      const message = args.join(' ');
+      if (message.includes('canAddToCart false') || 
+          message.includes('Failed to load resource: the server responded with a status of 400') ||
+          message.includes('Cannot read properties of undefined (reading \'_id\')') ||
+          message.includes('pixel.js:1')) {
+        // Suprimir erros específicos do UTMify
+        return;
+      }
+      originalConsoleError.apply(console, args);
+    };
+  })();
+  
+  // Função para carregar UTMify
+  function loadUTMify() {
     var script = document.createElement('script');
     script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
     script.async = true;
@@ -36,42 +52,37 @@
     script.onload = function() {
       console.log('UTMify pixel carregado');
       
-      // Aguardar inicialização completa
+      // Aguardar muito tempo para inicialização
       setTimeout(function() {
         if (window.utmify) {
           try {
-            // Configurar tratamento de erros global
-            window.utmify.onError = function(error) {
-              console.log('UTMify error tratado:', error);
-              return true; // Suprimir erro
-            };
+            // Configurar supressão de erros
+            window.utmify.onError = function() { return true; };
             
-            // Inicializar com tratamento de erro
             if (typeof window.utmify.init === 'function') {
               window.utmify.init();
-              console.log('UTMify inicializado com sucesso');
+              console.log('UTMify inicializado');
             }
           } catch (e) {
-            console.log('Erro na inicialização do UTMify:', e);
+            // Suprimir erro
           }
         }
-      }, 3000);
+      }, 5000);
     };
     
     script.onerror = function() {
-      console.log('Erro ao carregar UTMify, tentando novamente...');
       if (window.utmifyConfig.retryAttempts > 0) {
         window.utmifyConfig.retryAttempts--;
-        setTimeout(loadUTMifyWithErrorHandling, window.utmifyConfig.retryDelay);
+        setTimeout(loadUTMify, window.utmifyConfig.retryDelay);
       }
     };
     
     document.head.appendChild(script);
   }
   
-  // Carregar após DOM estar pronto
+  // Carregar após DOM
   document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(loadUTMifyWithErrorHandling, 2000);
+    setTimeout(loadUTMify, 3000);
   });
 </script>
 <!-- Google Pixel removido (causava erro 400) -->
