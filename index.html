@@ -18,17 +18,23 @@
 <script>
   window.pixelId = "6890066c4d245865ea1bf0b5";
   
-  // Carregar pixel de forma otimizada
-  (function() {
+  // Aguardar DOM carregar antes de inicializar
+  document.addEventListener('DOMContentLoaded', function() {
     var script = document.createElement('script');
     script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
     script.async = true;
     script.defer = true;
     script.onload = function() {
       console.log('UTMify pixel carregado com sucesso');
+      // Aguardar um pouco para o tracker inicializar
+      setTimeout(function() {
+        if (window.utmify && window.utmify.track) {
+          console.log('UTMify tracker pronto para uso');
+        }
+      }, 1000);
     };
     document.head.appendChild(script);
-  })();
+  });
 </script>
 <!-- Google Pixel Code -->
 <script>
@@ -1172,41 +1178,37 @@ menuIcon.textContent = '☰';
 
 <script id="cta-tracking-script">
 document.addEventListener('DOMContentLoaded', function() {
-  const ctaButtons = document.querySelectorAll('a[href*="ggcheckout"]');
-  
-  ctaButtons.forEach(button => {
-    button.addEventListener('click', function(e) {
-      console.log('CTA button clicked:', button.textContent);
-      
-      // Tracking UTMify
-      if (typeof window.utmify !== 'undefined' && window.utmify.track) {
-        window.utmify.track('conversion', {
-          event: 'click',
-          button_text: button.textContent,
-          url: window.location.href
-        });
-        console.log('UTMify conversion tracked');
-      } else {
-        console.log('UTMify não disponível - aguardando carregamento...');
-        // Aguardar UTMify carregar
-        setTimeout(function() {
-          if (typeof window.utmify !== 'undefined' && window.utmify.track) {
+  // Aguardar UTMify carregar completamente
+  setTimeout(function() {
+    const ctaButtons = document.querySelectorAll('a[href*="ggcheckout"]');
+    
+    ctaButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        console.log('CTA button clicked:', button.textContent);
+        
+        // Tracking UTMify com validação
+        if (typeof window.utmify !== 'undefined' && window.utmify.track) {
+          try {
             window.utmify.track('conversion', {
               event: 'click',
               button_text: button.textContent,
               url: window.location.href
             });
-            console.log('UTMify conversion tracked (delayed)');
+            console.log('UTMify conversion tracked com sucesso');
+          } catch (error) {
+            console.log('Erro no tracking UTMify:', error);
           }
-        }, 1000);
-      }
-      
-      // Tracking Google Pixel
-      if (typeof window.googlePixelId !== 'undefined') {
-        console.log('Google Pixel ID:', window.googlePixelId);
-      }
+        } else {
+          console.log('UTMify não disponível para tracking');
+        }
+        
+        // Tracking Google Pixel
+        if (typeof window.googlePixelId !== 'undefined') {
+          console.log('Google Pixel ID:', window.googlePixelId);
+        }
+      });
     });
-  });
+  }, 2000); // Aguardar 2 segundos para UTMify carregar
 });
 </script>
 </body>
