@@ -4,48 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>Portal Cristão - Plataforma Completa de Ensino</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⛪%3C/text%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com/3.4.16"></script>
 <script>tailwind.config={theme:{extend:{colors:{primary:'#ea580c',secondary:'#f97316',accent:'#c2410c',gradient:'#fb923c',dark:'#1a1a1a',darker:'#0f0f0f',light:'#f8f9fa'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'},boxShadow:{'glass':'0 8px 32px 0 rgba(31, 38, 135, 0.37)','glass-inset':'inset 0 1px 0 0 rgba(255, 255, 255, 0.05)','modern':'0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)','luxury':'0 25px 50px -12px rgba(0, 0, 0, 0.25)'}}}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
-<!-- UTMify Pixel Script -->
+<!-- UTMify Script -->
+<script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
+
+<!-- UTMify Pixel -->
 <script>
   window.pixelId = "6890066c4d245865ea1bf0b5";
-</script>
-<script
-  src="https://cdn.utmify.com.br/scripts/pixel/pixel.js"
-  async
-  defer
-></script>
-<script>
-  // Debug para verificar se o pixel carregou
-  window.addEventListener('load', function() {
-    console.log('Pixel ID:', window.pixelId);
-    console.log('UTMify pixel script loaded');
-    if (typeof window.utmify !== 'undefined') {
-      console.log('UTMify object loaded successfully');
-    } else {
-      console.log('UTMify object not found');
-    }
-    // Verificar se o pixel está funcionando
-    if (window.pixelId) {
-      console.log('Pixel ID está definido:', window.pixelId);
-    }
-  });
   
-  // Forçar inicialização do UTMify após 2 segundos
-  setTimeout(function() {
-    if (typeof window.utmify === 'undefined') {
-      console.log('UTMify não carregou, tentando novamente...');
-      var script = document.createElement('script');
-      script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-    }
-  }, 2000);
+  // Carregar pixel de forma otimizada
+  (function() {
+    var script = document.createElement('script');
+    script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
+    script.async = true;
+    script.defer = true;
+    script.onload = function() {
+      console.log('UTMify pixel carregado com sucesso');
+    };
+    document.head.appendChild(script);
+  })();
 </script>
 <!-- Google Pixel Code -->
 <script>
@@ -1187,61 +1170,44 @@ menuIcon.textContent = '☰';
 });
 </script>
 
-<script id="cta-buttons-script">
+<script id="cta-tracking-script">
 document.addEventListener('DOMContentLoaded', function() {
-const ctaButtons = document.querySelectorAll('a[href*="ggcheckout"], button');
-ctaButtons.forEach(button => {
-if (button.textContent.includes('Começar') || button.textContent.includes('Acessar') || button.textContent.includes('Quero') || button.textContent.includes('Escolha') || button.textContent.includes('Melhor')) {
-button.addEventListener('click', function(e) {
-e.preventDefault(); // Prevenir redirecionamento imediato
-console.log('CTA button clicked:', button.textContent);
-
-// Tracking UTMify
-if (typeof window.utmify !== 'undefined' && window.utmify.track) {
-window.utmify.track('conversion', {
-event: 'click',
-button_text: button.textContent,
-url: window.location.href
-});
-console.log('UTMify conversion tracked');
-} else {
-console.log('UTMify não disponível para tracking');
-// Tentar carregar UTMify novamente
-if (window.pixelId) {
-console.log('Tentando carregar UTMify novamente...');
-var script = document.createElement('script');
-script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
-script.async = true;
-script.defer = true;
-document.head.appendChild(script);
-}
-}
-
-// Tracking Google Pixel
-if (typeof window.googlePixelId !== 'undefined') {
-console.log('Google Pixel ID:', window.googlePixelId);
-}
-
-// Mostrar indicador de carregamento
-button.style.opacity = '0.7';
-button.style.pointerEvents = 'none';
-button.textContent = 'Redirecionando...';
-
-// Aguardar 1 segundo para o tracking ser enviado antes do redirecionamento
-setTimeout(function() {
-window.location.href = button.href;
-}, 1000);
-});
-}
-});
+  const ctaButtons = document.querySelectorAll('a[href*="ggcheckout"]');
+  
+  ctaButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      console.log('CTA button clicked:', button.textContent);
+      
+      // Tracking UTMify
+      if (typeof window.utmify !== 'undefined' && window.utmify.track) {
+        window.utmify.track('conversion', {
+          event: 'click',
+          button_text: button.textContent,
+          url: window.location.href
+        });
+        console.log('UTMify conversion tracked');
+      } else {
+        console.log('UTMify não disponível - aguardando carregamento...');
+        // Aguardar UTMify carregar
+        setTimeout(function() {
+          if (typeof window.utmify !== 'undefined' && window.utmify.track) {
+            window.utmify.track('conversion', {
+              event: 'click',
+              button_text: button.textContent,
+              url: window.location.href
+            });
+            console.log('UTMify conversion tracked (delayed)');
+          }
+        }, 1000);
+      }
+      
+      // Tracking Google Pixel
+      if (typeof window.googlePixelId !== 'undefined') {
+        console.log('Google Pixel ID:', window.googlePixelId);
+      }
+    });
+  });
 });
 </script>
-<script
-  src="https://cdn.utmify.com.br/scripts/utms/latest.js"
-  data-utmify-prevent-xcod-sck
-  data-utmify-prevent-subids
-  async
-  defer
-></script>
 </body>
 </html>
