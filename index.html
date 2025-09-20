@@ -14,26 +14,14 @@
 <!-- UTMify Script - Apenas UTM tracking básico (sem pixel problemático) -->
 <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 
-<!-- UTMify Pixel - Versão simplificada para conversões -->
+<!-- UTMify Pixel - DESABILITADO devido a erros persistentes -->
+<!-- 
 <script>
-  // Configuração mínima para conversões
-  window.pixelId = "6890066c4d245865ea1bf0b5";
-  
-  // Carregar pixel de forma mais simples
-  (function() {
-    var script = document.createElement('script');
-    script.src = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
-    script.async = true;
-    script.defer = true;
-    script.onload = function() {
-      console.log('UTMify pixel carregado para conversões');
-    };
-    script.onerror = function() {
-      console.log('Erro ao carregar UTMify pixel - continuando sem ele');
-    };
-    document.head.appendChild(script);
-  })();
+  // UTMify pixel desabilitado - causava erros 400 e TypeError persistentes
+  // Usando apenas UTM tracking + sistema alternativo de conversões
+  console.log('UTMify pixel desabilitado - usando sistema alternativo');
 </script>
+-->
 <!-- Google Pixel removido (causava erro 400) -->
 <style>
 :where([class^="ri-"])::before {
@@ -1172,24 +1160,15 @@ document.addEventListener('DOMContentLoaded', function() {
   
   ctaButtons.forEach(button => {
     button.addEventListener('click', function(e) {
-      console.log('CTA button clicked:', button.textContent.trim());
-      console.log('Link:', button.href);
+      const buttonText = button.textContent.trim();
+      const planValue = getPlanValue(buttonText);
       
-      // Aguardar UTMify processar o clique
-      setTimeout(function() {
-        // Tentar marcar conversão se UTMify estiver disponível
-        if (window.utmify && typeof window.utmify.track === 'function') {
-          try {
-            window.utmify.track('conversion', {
-              value: getPlanValue(button.textContent.trim()),
-              currency: 'BRL'
-            });
-            console.log('Conversão marcada no UTMify');
-          } catch (e) {
-            console.log('Erro ao marcar conversão:', e);
-          }
-        }
-      }, 1000);
+      console.log('CTA button clicked:', buttonText);
+      console.log('Link:', button.href);
+      console.log('Valor do plano:', planValue);
+      
+      // Sistema alternativo de tracking de conversões
+      trackConversion(buttonText, planValue, button.href);
     });
   });
   
@@ -1201,7 +1180,57 @@ document.addEventListener('DOMContentLoaded', function() {
     return 0;
   }
   
-  console.log('Sistema de tracking configurado - UTMify ativo para conversões');
+  // Sistema alternativo de tracking de conversões
+  function trackConversion(buttonText, value, url) {
+    // 1. Salvar no localStorage para análise
+    const conversion = {
+      timestamp: new Date().toISOString(),
+      button: buttonText,
+      value: value,
+      url: url,
+      utm_source: getUrlParameter(url, 'utm_source'),
+      utm_campaign: getUrlParameter(url, 'utm_campaign'),
+      utm_medium: getUrlParameter(url, 'utm_medium')
+    };
+    
+    // Salvar conversão
+    const conversions = JSON.parse(localStorage.getItem('conversions') || '[]');
+    conversions.push(conversion);
+    localStorage.setItem('conversions', JSON.stringify(conversions));
+    
+    console.log('Conversão salva localmente:', conversion);
+    
+    // 2. Enviar para Google Analytics se disponível
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'conversion', {
+        'event_category': 'purchase',
+        'event_label': buttonText,
+        'value': value,
+        'currency': 'BRL'
+      });
+      console.log('Conversão enviada para Google Analytics');
+    }
+    
+    // 3. Enviar para Facebook Pixel se disponível
+    if (typeof fbq !== 'undefined') {
+      fbq('track', 'Purchase', {
+        value: value,
+        currency: 'BRL'
+      });
+      console.log('Conversão enviada para Facebook Pixel');
+    }
+    
+    // 4. Log para debug
+    console.log('Sistema de conversão ativo - dados salvos');
+  }
+  
+  // Função auxiliar para extrair parâmetros da URL
+  function getUrlParameter(url, name) {
+    const urlParams = new URLSearchParams(url.split('?')[1] || '');
+    return urlParams.get(name) || '';
+  }
+  
+  console.log('Sistema de tracking configurado - conversões salvas localmente');
 });
 </script>
 </body>
