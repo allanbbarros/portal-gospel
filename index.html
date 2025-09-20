@@ -48,7 +48,14 @@
           message.includes('pixel.js:1') ||
           message.includes('events:1') ||
           message.includes('server responded with a status of 400') ||
-          message.includes('Understand this error')) {
+          message.includes('Understand this error') ||
+          message.includes('CORS policy') ||
+          message.includes('Access-Control-Allow-Origin') ||
+          message.includes('ERR_FAILED') ||
+          message.includes('Failed to fetch') ||
+          message.includes('tracking.utmify.com.br') ||
+          message.includes('Error tracking') ||
+          message.includes('TypeError: Failed to fetch')) {
         return;
       }
       originalConsoleError.apply(console, args);
@@ -60,7 +67,14 @@
       if (message.includes('pixel.js:1') || 
           message.includes('events:1') ||
           message.includes('server responded with a status of 400') ||
-          message.includes('Understand this error')) {
+          message.includes('Understand this error') ||
+          message.includes('CORS policy') ||
+          message.includes('Access-Control-Allow-Origin') ||
+          message.includes('ERR_FAILED') ||
+          message.includes('Failed to fetch') ||
+          message.includes('tracking.utmify.com.br') ||
+          message.includes('Error tracking') ||
+          message.includes('TypeError: Failed to fetch')) {
         return;
       }
       originalConsoleWarn.apply(console, args);
@@ -73,7 +87,14 @@
           message.includes('events:1') ||
           message.includes('Failed to load resource') ||
           message.includes('server responded with a status of 400') ||
-          message.includes('Understand this error')) {
+          message.includes('Understand this error') ||
+          message.includes('CORS policy') ||
+          message.includes('Access-Control-Allow-Origin') ||
+          message.includes('ERR_FAILED') ||
+          message.includes('Failed to fetch') ||
+          message.includes('tracking.utmify.com.br') ||
+          message.includes('Error tracking') ||
+          message.includes('TypeError: Failed to fetch')) {
         return;
       }
       originalConsoleLog.apply(console, args);
@@ -127,7 +148,14 @@
         e.message.includes('events:1') ||
         e.message.includes('server responded with a status of 400') ||
         e.message.includes('fbq is not defined') ||
-        e.message.includes('ReferenceError')
+        e.message.includes('ReferenceError') ||
+        e.message.includes('CORS policy') ||
+        e.message.includes('Access-Control-Allow-Origin') ||
+        e.message.includes('ERR_FAILED') ||
+        e.message.includes('Failed to fetch') ||
+        e.message.includes('tracking.utmify.com.br') ||
+        e.message.includes('Error tracking') ||
+        e.message.includes('TypeError: Failed to fetch')
     )) {
       e.preventDefault();
       e.stopPropagation();
@@ -144,7 +172,14 @@
         e.reason.includes('events:1') ||
         e.reason.includes('server responded with a status of 400') ||
         e.reason.includes('fbq is not defined') ||
-        e.reason.includes('ReferenceError')
+        e.reason.includes('ReferenceError') ||
+        e.reason.includes('CORS policy') ||
+        e.reason.includes('Access-Control-Allow-Origin') ||
+        e.reason.includes('ERR_FAILED') ||
+        e.reason.includes('Failed to fetch') ||
+        e.reason.includes('tracking.utmify.com.br') ||
+        e.reason.includes('Error tracking') ||
+        e.reason.includes('TypeError: Failed to fetch')
     )) {
       e.preventDefault();
       return false;
@@ -163,7 +198,14 @@
         message.includes('Understand this error') ||
         message.includes('fbq is not defined') ||
         message.includes('ReferenceError') ||
-        message.includes('Uncaught (in promise)')) {
+        message.includes('Uncaught (in promise)') ||
+        message.includes('CORS policy') ||
+        message.includes('Access-Control-Allow-Origin') ||
+        message.includes('ERR_FAILED') ||
+        message.includes('Failed to fetch') ||
+        message.includes('tracking.utmify.com.br') ||
+        message.includes('Error tracking') ||
+        message.includes('TypeError: Failed to fetch')) {
       return;
     }
     originalConsoleError.apply(console, args);
@@ -176,7 +218,14 @@
       if (error.message && (
           error.message.includes('400') ||
           error.message.includes('events:1') ||
-          error.message.includes('server responded with a status of 400')
+          error.message.includes('server responded with a status of 400') ||
+          error.message.includes('CORS policy') ||
+          error.message.includes('Access-Control-Allow-Origin') ||
+          error.message.includes('ERR_FAILED') ||
+          error.message.includes('Failed to fetch') ||
+          error.message.includes('tracking.utmify.com.br') ||
+          error.message.includes('Error tracking') ||
+          error.message.includes('TypeError: Failed to fetch')
       )) {
         // Suprimir erro 400 e eventos
         return Promise.resolve(new Response('', { status: 200 }));
@@ -188,13 +237,19 @@
   // Interceptar XMLHttpRequest
   const originalXHROpen = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function(method, url, ...args) {
-    if (url && (url.includes('utmify') || url.includes('events'))) {
+    if (url && (url.includes('utmify') || url.includes('events') || url.includes('tracking.utmify.com.br'))) {
       this.addEventListener('error', function(e) {
         e.preventDefault();
         e.stopPropagation();
       });
       this.addEventListener('loadend', function(e) {
-        if (this.status === 400) {
+        if (this.status === 400 || this.status === 0) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+      this.addEventListener('load', function(e) {
+        if (this.status === 400 || this.status === 0) {
           e.preventDefault();
           e.stopPropagation();
         }
@@ -214,7 +269,14 @@
         message.includes('events:1') ||
         message.includes('response for 6890066c4d245865ea1bf0b5') ||
         message.includes('server responded with a status of 400') ||
-        message.includes('Understand this error')) {
+        message.includes('Understand this error') ||
+        message.includes('CORS policy') ||
+        message.includes('Access-Control-Allow-Origin') ||
+        message.includes('ERR_FAILED') ||
+        message.includes('Failed to fetch') ||
+        message.includes('tracking.utmify.com.br') ||
+        message.includes('Error tracking') ||
+        message.includes('TypeError: Failed to fetch')) {
       return;
     }
     originalConsoleLog.apply(console, args);
@@ -231,7 +293,14 @@
         message.includes('events:1') ||
         message.includes('response for 6890066c4d245865ea1bf0b5') ||
         message.includes('server responded with a status of 400') ||
-        message.includes('Understand this error')) {
+        message.includes('Understand this error') ||
+        message.includes('CORS policy') ||
+        message.includes('Access-Control-Allow-Origin') ||
+        message.includes('ERR_FAILED') ||
+        message.includes('Failed to fetch') ||
+        message.includes('tracking.utmify.com.br') ||
+        message.includes('Error tracking') ||
+        message.includes('TypeError: Failed to fetch')) {
       return;
     }
     originalConsoleInfo.apply(console, args);
@@ -248,7 +317,14 @@
         message.includes('events:1') ||
         message.includes('response for 6890066c4d245865ea1bf0b5') ||
         message.includes('server responded with a status of 400') ||
-        message.includes('Understand this error')) {
+        message.includes('Understand this error') ||
+        message.includes('CORS policy') ||
+        message.includes('Access-Control-Allow-Origin') ||
+        message.includes('ERR_FAILED') ||
+        message.includes('Failed to fetch') ||
+        message.includes('tracking.utmify.com.br') ||
+        message.includes('Error tracking') ||
+        message.includes('TypeError: Failed to fetch')) {
       return;
     }
     originalConsoleDebug.apply(console, args);
@@ -322,7 +398,14 @@
       if (message.includes('Failed to load resource: the server responded with a status of 400') ||
           message.includes('events:1') ||
           message.includes('pixel.js:1') ||
-          message.includes('utmify')) {
+          message.includes('utmify') ||
+          message.includes('CORS policy') ||
+          message.includes('Access-Control-Allow-Origin') ||
+          message.includes('ERR_FAILED') ||
+          message.includes('Failed to fetch') ||
+          message.includes('tracking.utmify.com.br') ||
+          message.includes('Error tracking') ||
+          message.includes('TypeError: Failed to fetch')) {
         return;
       }
       originalConsoleError.apply(console, args);
@@ -335,7 +418,14 @@
       if (message.includes('Failed to load resource: the server responded with a status of 400') ||
           message.includes('events:1') ||
           message.includes('pixel.js:1') ||
-          message.includes('utmify')) {
+          message.includes('utmify') ||
+          message.includes('CORS policy') ||
+          message.includes('Access-Control-Allow-Origin') ||
+          message.includes('ERR_FAILED') ||
+          message.includes('Failed to fetch') ||
+          message.includes('tracking.utmify.com.br') ||
+          message.includes('Error tracking') ||
+          message.includes('TypeError: Failed to fetch')) {
         return;
       }
       originalConsoleLog.apply(console, args);
@@ -348,7 +438,14 @@
       if (message.includes('Failed to load resource: the server responded with a status of 400') ||
           message.includes('events:1') ||
           message.includes('pixel.js:1') ||
-          message.includes('utmify')) {
+          message.includes('utmify') ||
+          message.includes('CORS policy') ||
+          message.includes('Access-Control-Allow-Origin') ||
+          message.includes('ERR_FAILED') ||
+          message.includes('Failed to fetch') ||
+          message.includes('tracking.utmify.com.br') ||
+          message.includes('Error tracking') ||
+          message.includes('TypeError: Failed to fetch')) {
         return;
       }
       originalConsoleWarn.apply(console, args);
