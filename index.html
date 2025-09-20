@@ -26,19 +26,43 @@
     retryDelay: 3000
   };
   
-  // Interceptar e suprimir erros do UTMify
+  // Interceptar e suprimir TODOS os erros do UTMify
   (function() {
     const originalConsoleError = console.error;
+    const originalConsoleWarn = console.warn;
+    const originalConsoleLog = console.log;
+    
+    // Suprimir console.error
     console.error = function(...args) {
       const message = args.join(' ');
       if (message.includes('canAddToCart false') || 
           message.includes('Failed to load resource: the server responded with a status of 400') ||
           message.includes('Cannot read properties of undefined (reading \'_id\')') ||
-          message.includes('pixel.js:1')) {
-        // Suprimir erros específicos do UTMify
+          message.includes('pixel.js:1') ||
+          message.includes('events:1')) {
         return;
       }
       originalConsoleError.apply(console, args);
+    };
+    
+    // Suprimir console.warn
+    console.warn = function(...args) {
+      const message = args.join(' ');
+      if (message.includes('pixel.js:1') || message.includes('events:1')) {
+        return;
+      }
+      originalConsoleWarn.apply(console, args);
+    };
+    
+    // Suprimir logs específicos do UTMify
+    console.log = function(...args) {
+      const message = args.join(' ');
+      if (message.includes('pixel.js:1') || 
+          message.includes('events:1') ||
+          message.includes('Failed to load resource')) {
+        return;
+      }
+      originalConsoleLog.apply(console, args);
     };
   })();
   
@@ -79,6 +103,31 @@
     
     document.head.appendChild(script);
   }
+  
+  // Interceptar erros de rede globalmente
+  window.addEventListener('error', function(e) {
+    if (e.message && (
+        e.message.includes('Failed to load resource') ||
+        e.message.includes('400') ||
+        e.message.includes('pixel.js')
+    )) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  });
+  
+  // Interceptar erros de Promise
+  window.addEventListener('unhandledrejection', function(e) {
+    if (e.reason && (
+        e.reason.includes('Failed to load resource') ||
+        e.reason.includes('400') ||
+        e.reason.includes('pixel.js')
+    )) {
+      e.preventDefault();
+      return false;
+    }
+  });
   
   // Carregar após DOM
   document.addEventListener('DOMContentLoaded', function() {
